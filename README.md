@@ -15,6 +15,47 @@
 
 ![image](https://user-images.githubusercontent.com/48191157/71572294-a88dc580-2b21-11ea-8787-38159d41d8dc.png)
 
+    public class virtual_button1_1 : MonoBehaviour, IVirtualButtonEventHandler
+    {
+    public GameObject anim_object;
+    public GameObject cy;
+    //public GameObject cy_particle;
+    public Animator cy_ani;
+    //Vector3 pos;
+    
+    // Start is called before the first frame update
+    void Start()
+    {
+        VirtualButtonBehaviour vb_behaviour;
+        vb_behaviour = this.GetComponent<VirtualButtonBehaviour>();
+        vb_behaviour.RegisterEventHandler(this);
+    }
+    public void OnButtonPressed(VirtualButtonBehaviour vb)
+    {
+        Debug.Log("Virtual Button Pressed");
+        cy_ani.SetBool("Punch", true);
+        //cy_particle.SetActive(true);
+       // pos = cy.transform.rotation.eulerAngles;
+       //anim_object.GetComponent<Animation>().Play();
+    }
+
+    public void OnButtonReleased(VirtualButtonBehaviour vb)
+    {
+        Debug.Log("Virtual Button Released");
+        cy_ani.SetBool("Punch", false);
+        //cy_particle.SetActive(false);
+        //   cy.transform.eulerAngles = pos;
+        //  cy.transform.DORotate(new Vector3(0f, -90f, 0f), 0.1f).SetEase(Ease.Linear);
+        // anim_object.GetComponent<Animation>().Stop();
+    }
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+}
+
+
 4. 간단한 동작_방어
 
 ![image](https://user-images.githubusercontent.com/48191157/71572299-ad527980-2b21-11ea-8996-e3cb56e862d4.png)
@@ -22,6 +63,90 @@
 5. 격투장면_1
 
 ![image](https://user-images.githubusercontent.com/48191157/71572313-bfccb300-2b21-11ea-89dc-5b0b997a7405.png)
+
+    public class Man_Damaged : MonoBehaviour
+    {
+    // Start is called before the first frame update
+    public GameObject Man_body;
+    public Animator Man_ani;
+    private AudioSource audio_source;
+    public AudioClip beat;
+    public AudioClip die;
+    public Text fight;
+    public Text Cy_win;
+    public float m_StartingHealth = 100f;
+    public float m_CurrentHealth;    
+    public Image m_FillImage1;
+    public Image m_FillImage2;
+    public Image m_FillImage3;
+    public Image m_FillImage4;
+    public Image m_FillImage5;
+
+    void Start()
+    {
+        m_CurrentHealth = m_StartingHealth;
+        audio_source = gameObject.AddComponent<AudioSource>();
+        audio_source.clip = beat;
+        audio_source.loop = false;
+        audio_source.playOnAwake = false;
+        Invoke("UI_1", 4.0f);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Cy_attack"))
+        {            
+            Man_ani.SetBool("Beat", true);
+            audio_source.Play();
+            Invoke("Ani_Cancel", 1.0f);
+            m_CurrentHealth -= 15;          
+
+            if (m_CurrentHealth > 80)
+                m_FillImage5.color = Color.Lerp(Color.red, Color.white, 0f);
+            if (m_CurrentHealth <= 80 && m_CurrentHealth > 60)
+                m_FillImage5.color = Color.Lerp(Color.red, Color.white, 1f);
+            if (m_CurrentHealth <= 60 && m_CurrentHealth > 40)
+                m_FillImage4.color = Color.Lerp(Color.red, Color.white, 1f);
+            if (m_CurrentHealth <= 40 && m_CurrentHealth > 20)
+                m_FillImage3.color = Color.Lerp(Color.red, Color.white, 1f);
+            if (m_CurrentHealth <= 20 && m_CurrentHealth > 0)
+                m_FillImage2.color = Color.Lerp(Color.red, Color.white, 1f);
+            if (m_CurrentHealth <= 0) { 
+                m_FillImage1.color = Color.Lerp(Color.red, Color.white, 1f);
+                Cy_win.text = "Dump_Win";
+                Invoke("UI_2", 5.0f);
+            }
+        }
+    }
+       
+
+    void Ani_Cancel()
+    {
+        Man_ani.SetBool("Beat", false);
+        if(m_CurrentHealth <=0 && m_CurrentHealth >= -20)
+        {
+            Man_ani.SetBool("Die", true);
+            audio_source.clip = die;
+            audio_source.Play();
+            audio_source.loop = false;
+        }
+    }
+
+    void UI_1()
+    {
+        fight.text = "";
+    }
+
+    void UI_2()
+    {
+        Cy_win.text = "";
+    }
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}
 
 5_1. 격투장면_2
 
